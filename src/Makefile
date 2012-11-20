@@ -14,12 +14,12 @@ m.exe: m.fl Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h \
 	g++ -c -Os `fltk-config --cxxflags` Codebox.cxx
 	g++ -c -Os `fltk-config --cxxflags` Knob.cxx
 	g++ -c -Os  -I/usr/local/include/SDL Cw.cxx
-	g++ -om.exe m.o Bargraph.o Codebox.o Cw.o Knob.o \
+	g++ -o m.exe m.o Bargraph.o Codebox.o Cw.o Knob.o \
 	  -static `fltk-config --ldstaticflags` \
 	  -lSDL -lmingw32 -lmingwex -lwinmm -lSDLmain	  
 	strip m.exe
 	rm *.o m.cxx m.h
-	
+
 # Regular "make" is what you want for the Linux version
 
 m: m.fl Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h \
@@ -30,11 +30,16 @@ m: m.fl Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h \
 	g++ -c -Os `fltk-config --cxxflags` Codebox.cxx
 	g++ -c -Os `fltk-config --cxxflags` Knob.cxx
 	g++ -c -Os `sdl-config    --cflags` Cw.cxx
-	g++ -static -om m.o Bargraph.o Codebox.o Cw.o Knob.o \
-	  `sdl-config --static-libs` \
-	  `fltk-config --ldstaticflags` -ldl
+	g++ -shared-libgcc -o m m.o Bargraph.o Codebox.o Cw.o Knob.o \
+	  `sdl-config --libs` \
+	  `fltk-config --ldflags` -ldl
 	strip m
 	rm *.o m.cxx m.h
+
+# JJT:  Mac OS X does not allow linking crt0.o with -static
+#	g++ -static -o m m.o Bargraph.o Codebox.o Cw.o Knob.o \
+#	  `sdl-config --static-libs` \
+#	  `fltk-config --ldstaticflags` -ldl
 
 # Besemer's Python extension version
 
