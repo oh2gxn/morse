@@ -6,4 +6,9 @@ Original work by Ward Cunningham.
 
 Forked from a version by Jim Wilson.
 
-Later bugs by Janne OH2GXN
+Later bugs by Janne OH2GXN:
+- Compiles on my Mac OS X 10.6.8:
+  - Requires following MacPorts packages: libsdl, fltk, Xft2
+  - Start X11, open a terminal, cd src
+  - make m
+  - ./m
