@@ -82,7 +82,8 @@ Codebox::Codebox(int x, int y, int w, int h):
 void Codebox::draw() {			// Called by FLTK to do drawing
   Fl_Boxtype b = box();			// Get box type (downbox?)
   if (damage() & FL_DAMAGE_ALL)		// (Code stolen from Fl_Input.cxx
-    draw_box(b, color());		//  after my version dirtied up the
+    draw_box();                         //  after my version dirtied up the
+    //draw_box(b, color());// FIXME
   drawtext(x()+Fl::box_dx(b),		//  box border.  I'm not sure what
   	   y()+Fl::box_dy(b),		//  this does, but it seems to work.
            w()-Fl::box_dw(b),

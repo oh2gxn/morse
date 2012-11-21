@@ -13,12 +13,19 @@ m.exe: m.fl Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h \
 	g++ -c -Os `fltk-config --cxxflags` Bargraph.cxx
 	g++ -c -Os `fltk-config --cxxflags` Codebox.cxx
 	g++ -c -Os `fltk-config --cxxflags` Knob.cxx
-	g++ -c -Os  -I/usr/local/include/SDL Cw.cxx
+	g++ -c -Os `sdl-config  --cflags`   Cw.cxx
 	g++ -o m.exe m.o Bargraph.o Codebox.o Cw.o Knob.o \
-	  -static `fltk-config --ldstaticflags` \
+	  -shared-libgcc `fltk-config --ldflags` \
 	  -lSDL -lmingw32 -lmingwex -lwinmm -lSDLmain	  
 	strip m.exe
 	rm *.o m.cxx m.h
+
+# Mac OS X didn't like these either:
+#	g++ -c -Os  -I/usr/local/include/SDL Cw.cxx
+#	g++ -o m.exe m.o Bargraph.o Codebox.o Cw.o Knob.o \
+#	  -static `fltk-config --ldstaticflags` \
+#	  -lSDL -lmingw32 -lmingwex -lwinmm -lSDLmain	  
+
 
 # Regular "make" is what you want for the Linux version
 
@@ -29,7 +36,7 @@ m: m.fl Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h \
 	g++ -c -Os `fltk-config --cxxflags` Bargraph.cxx	
 	g++ -c -Os `fltk-config --cxxflags` Codebox.cxx
 	g++ -c -Os `fltk-config --cxxflags` Knob.cxx
-	g++ -c -Os `sdl-config    --cflags` Cw.cxx
+	g++ -c -Os `sdl-config  --cflags`   Cw.cxx
 	g++ -shared-libgcc -o m m.o Bargraph.o Codebox.o Cw.o Knob.o \
 	  `sdl-config --libs` \
 	  `fltk-config --ldflags` -ldl
