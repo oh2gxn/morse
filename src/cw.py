@@ -1,4 +1,5 @@
 #! /usr/bin/python
+# -*- coding: utf-8 -*-
 
 #   Copyright 1998-2004 Ward Cunningham and Jim Wilson
 #   Distributed under the GNU GPL V2 license.
@@ -20,21 +21,85 @@
 #   with Morse; if not, write to the Free Software Foundation, Inc.,
 #   59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-Code = """
-A .-    F ..-.  K -.-   P .--.  U ..-   Z --..    = -...-   / -..-.   + .-.-.
-B -...  G --.   L .-..  Q --.-  V ...-  . .-.-.-  : ---...  " .-..-.  @ .--.-.
-C -.-.  H ....  M --    R .-.   W .--   , --..--  ; -.-.-.  $ ...-.-  
-D -..   I ..    N -.    S ...   X -..-  ? ..--..  ( -.--.   ' .----.  
-E .     J .---  O ---   T -     Y -.--  - -....-  ) -.--.-  _ ..--.-
+#   Additions by Janne Toivola: Scandinavian letters ÅÄÖ (not in ASCII)
 
-0 ----- 5 .....
-1 .---- 6 -....
-2 ..--- 7 --...
-3 ...-- 8 ---..
-4 ....- 9 ----.
+
+# The Morse codes in a string: "key1 value1 key2 value2...", then split.
+# Except for the word space, which is added later directly
+# to the dictionary of bit codes.
+# !, $, _, and & may be non-standard:
+#   ! can also be -.-.-- or ---. (which interferes with Ö)
+#   $ and _ not in ITU
+#   & is replaced by ES
+Code = u"""
+A .- 
+B -... 
+C -.-. 
+D -.. 
+E . 
+F ..-. 
+G --. 
+H .... 
+I .. 
+J .--- 
+K -.- 
+L .-.. 
+M -- 
+N -. 
+O --- 
+P .--. 
+Q --.- 
+R .-. 
+S ... 
+T - 
+U ..- 
+V ...- 
+W .-- 
+X -..- 
+Y -.-- 
+Z --..
+Å .--.-
+Ä .-.-
+Ö ---.
+Ü ..--
+0 ----- 
+1 .---- 
+2 ..--- 
+3 ...-- 
+4 ....- 
+5 ..... 
+6 -.... 
+7 --... 
+8 ---.. 
+9 ----. 
+. .-.-.- 
+, --..-- 
+? ..--..
+' .----. 
+! ..--. 
+/ -..-. 
+( -.--. 
+) -.--.- 
+& .-...
+: ---... 
+; -.-.-. 
+= -...- 
++ .-.-. 
+- -....- 
+_ ..--.- 
+" .-..-. 
+$ ...-..- 
+@ .--.-. 
 """.split()
 
-ASCII = """ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ"""
+# This string defines the order in which output is printed.
+# Morse relies on indexing the array with ASCII characters.
+ASCII = u""" !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ"""
+# These are not in the above list of codes: #%*<>
+
+# This adds some characters beyond ASCII,
+# and requires additional hacks in the Morse program
+ASCIIplus = ASCII + u"""ÅÄÖÜ"""
 
 # A little function to turn a string of dots/dashes to a bit pattern
 
@@ -66,25 +131,17 @@ def l2d(l):		# [key1,value1, key2,value2, ...] to dictionary
   return d		# Return dictionary we've been building
 
 
-Code = l2d(Code)	# Dictionary of code (lacks word space!)
-Code[" "] = 0x10	# Add length-4 word space (length-7 total)
+Dict = l2d(Code)	# Dictionary of code (lacks word space!)
+Dict[" "] = 0x10	# Add length-4 word space (length-7 total)
 
 
 print "static unsigned Code[] = { // ***  Clean me up please!  ***\n  ",
 
-comment = []		# List of ASCII characters (to use as comment)
-for c in ASCII:		# Loop to print 4 characters/line
-  comment += c		#   Add ASCII to comment 
-  try: c = Code[c]	#   See if there is a Morse equivalent
-  except: c = 0		#   If not, we'll flag with special value
-  print "0x%0.7X," % c,	#   Print code element bit pattern in hex
-  if len(comment) == 4: #   If we've printed four items,
-    print "//",	comment #     Print C++ comment
-    comment = []	#     Empty ASCII list for next line
-    print "  ",		#     Indent next line two spaces (See BUG!)
-if len(comment): 	# If incomplete last line,
-  o = 4-len(comment)	#   (Number entries) omitted from last line
-  for i in xrange(o):	#   Loop to pad for omitted entries
-    print "          ",	#     Print spaces to pad "0xnnnnnnn,"
-  print "//", comment	# BUG: If len(ASCII) is a multiple of four, 
-print "};"		#   indentation of the closing "};" is FUBAR
+# Originally, this code printed 4 chars/line, now only one/line.
+for c in ASCIIplus:     # Loop to print one character/line
+  try: b = Dict[c]	#   See if there is a Morse equivalent
+  except: b = 0		#   If not, we'll flag with special value
+  print "0x%0.7X," % b,	#   Print code element bit pattern in hex
+  print "//", c         #     Print C++ comment
+  print "  ",		#     Indent next line two spaces (See BUG!)
+print "};"

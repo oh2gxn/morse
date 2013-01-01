@@ -280,7 +280,77 @@ void waveget(void*, Uint8* destination, int n) {
  *  to think up ways of wasting all those bits, too.
  *
  *  For help generating this table, see the Python script, cw.py
+ *
+ *  Nordic ÅÄÖ by Janne Toivola
  */
+static unsigned Code[] = {
+   0x0000010, // SPC
+   0x0011775, // !
+   0x0045D5D, // "
+   0x0000000, // #
+   0x011D5D5, // $
+   0x0000000, // %
+   0x000455D, // &
+   0x045DDDD, // '
+   0x0045DD7, // (
+   0x0475DD7, // )
+   0x0000000, // *
+   0x001175D, // +
+   0x0477577, // ,
+   0x0047557, // -
+   0x011D75D, // .
+   0x0011757, // /
+   0x0477777, // 0
+   0x011DDDD, // 1
+   0x0047775, // 2
+   0x0011DD5, // 3
+   0x0004755, // 4
+   0x0001155, // 5
+   0x0004557, // 6
+   0x0011577, // 7
+   0x0045777, // 8
+   0x0117777, // 9
+   0x0115777, // :
+   0x01175D7, // ;
+   0x0000000, // <
+   0x0011D57, // =
+   0x0000000, // >
+   0x0045775, // ?
+   0x01175DD, // @
+   0x000011D, // A
+   0x0001157, // B
+   0x00045D7, // C
+   0x0000457, // D
+   0x0000011, // E
+   0x0001175, // F
+   0x0001177, // G
+   0x0000455, // H
+   0x0000045, // I
+   0x0011DDD, // J
+   0x00011D7, // K
+   0x000115D, // L
+   0x0000477, // M
+   0x0000117, // N
+   0x0004777, // O
+   0x00045DD, // P
+   0x0011D77, // Q
+   0x000045D, // R
+   0x0000115, // S
+   0x0000047, // T
+   0x0000475, // U
+   0x00011D5, // V
+   0x00011DD, // W
+   0x0004757, // X
+   0x0011DD7, // Y
+   0x0004577, // Z
+   0x00475DD, // Å, non-ASCII!
+   0x000475D, // Ä, non-ASCII!
+   0x0011777, // Ö, non-ASCII!
+   0x0004775  // Ü, non-ASCII!
+};
+
+
+/* Old plain ASCII version, with some weird $
 static int Code[] = { 
   0x0000010, 0x0000000, 0x0045D5D, 0x0000000, // ' ', '!', '"', '#'
   0x00475D5, 0x0000000, 0x0000000, 0x045DDDD, // '$', '%', '&', "'"
@@ -298,6 +368,7 @@ static int Code[] = {
   0x0000047, 0x0000475, 0x00011D5, 0x00011DD, // 'T', 'U', 'V', 'W'
   0x0004757, 0x0011DD7, 0x0004577,	      // 'X', 'Y', 'Z'
 };
+*/
 
 /***	Send_cw - Convert character to Morse and send it
  *
@@ -305,6 +376,7 @@ static int Code[] = {
  *  transmission of its ASCII-coded parameter in Morse on the speakers.
  *  Since Unicode is the same as ASCII for all the Morse characters, it
  *  may be used as well.  Morse characters are in [.?/-@ 0-9A-Za-z].
+ *  NOTE: Janne Toivola added [ÅÄÖÜåäöü].
  *
  *  An illegal character generates a zero-length silence.  It may be used
  *  to wait for the queue to clear or to test the state of the queue if
@@ -318,6 +390,7 @@ static int Code[] = {
  *  until another legitimate character (typically a blank) stops it.
  */
 bool send_cw(int letter) {
+  int code = 0;
   if (!letter) { Morse = 5; }		// Continuous dits? Send special value
   else if (Morse == 5) Morse = 0;	// Sending dits? Legit char to cancel
     
@@ -328,10 +401,20 @@ bool send_cw(int letter) {
   if ('a' <= letter && letter <= 'z')	// Tableless "toupper()"
     letter -= 'a'-'A';
   if (' ' <= letter && letter <= 'Z')	// If in Code[] table,
-    letter = Code[letter-' '];		//   convert it to Morse.
-  else letter = 0;			// If not, it's not Morse
+    code = Code[letter-' '];		//   convert it to Morse.
+  else {// now this gets kind of ugly
+    if (letter == 'Å')
+      code = Code['Z'-' '+1];
+    if (letter == 'Ä')
+      code = Code['Z'-' '+2];
+    if (letter == 'Ö')
+      code = Code['Z'-' '+3];
+    if (letter == 'Ü')
+      code = Code['Z'-' '+4];
+      //else code = 0;			// If not, it's not Morse
+  }
   while (Morse);			// Wait for queue to empty
-  Morse = letter; idle = 0;		// Stuff in latest char
+  Morse = code; idle = 0;		// Stuff in latest char
   return true;				//  and report "success!"
 }
 
