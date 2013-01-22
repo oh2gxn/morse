@@ -6,9 +6,7 @@ m.tgz: m m.exe
 
 # Use "xmake" to generate m.exe
 
-m.exe: m.fl Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h \
-    Knob.cxx Knob.h Help.h m.fl
-	fluid -c m.fl
+m.exe: m.cxx Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h Knob.cxx Knob.h Help.h
 	g++ -c -Os `fltk-config --cxxflags` m.cxx
 	g++ -c -Os `fltk-config --cxxflags` Bargraph.cxx
 	g++ -c -Os `fltk-config --cxxflags` Codebox.cxx
@@ -18,7 +16,7 @@ m.exe: m.fl Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h \
 	  -shared-libgcc `fltk-config --ldflags` \
 	  -lSDL -lmingw32 -lmingwex -lwinmm -lSDLmain	  
 	strip m.exe
-	rm *.o m.cxx m.h
+#	rm *.o m.h
 
 # Mac OS X didn't like these either:
 #	g++ -c -Os  -I/usr/local/include/SDL Cw.cxx
@@ -29,9 +27,7 @@ m.exe: m.fl Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h \
 
 # Regular "make" is what you want for the Linux version
 
-m: m.fl Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h \
-    Knob.cxx Knob.h Help.h m.fl
-	fluid -c m.fl
+m: m.cxx Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h Knob.cxx Knob.h Help.h
 	g++ -c -Os `fltk-config --cxxflags` m.cxx
 	g++ -c -Os `fltk-config --cxxflags` Bargraph.cxx	
 	g++ -c -Os `fltk-config --cxxflags` Codebox.cxx
@@ -41,7 +37,10 @@ m: m.fl Bargraph.cxx Bargraph.h Codebox.cxx Codebox.h Cw.cxx Cw.h \
 	  `sdl-config --libs` \
 	  `fltk-config --ldflags` -ldl
 	strip m
-	rm *.o m.cxx m.h
+#	rm *.o m.h
+
+m.cxx: m.fl
+	fluid -c m.fl
 
 # JJT:  Mac OS X does not allow linking crt0.o with -static
 #	g++ -static -o m m.o Bargraph.o Codebox.o Cw.o Knob.o \
@@ -55,7 +54,10 @@ cw.so: cw.pyx Cw.cxx Cw.h
 	gcc -c -fPIC -I/usr/include/python2.3 cw.c
 	gcc -c -fPIC `sdl-config --cflags` Cw.cxx
 	g++ -shared cw.o Cw.o -static `sdl-config --static-libs` -ocw.so
-	rm cw.c *.o
+#	rm cw.c *.o
 
 Help.h: m.htm
 	./help.py <m.htm >Help.h
+
+# Don't remove m.cxx generated from m.fl
+.PRECIOUS: m.cxx

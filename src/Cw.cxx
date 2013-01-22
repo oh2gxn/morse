@@ -399,20 +399,21 @@ bool send_cw(int letter) {
     letter = -letter;			//   If room, convert to "normal" ASCII
   }
   if ('a' <= letter && letter <= 'z')	// Tableless "toupper()"
-    letter -= 'a'-'A';
+    letter -= 'a'-'A'; // åäöü skip this part
   if (' ' <= letter && letter <= 'Z')	// If in Code[] table,
     code = Code[letter-' '];		//   convert it to Morse.
-  else {// now this gets kind of ugly
-    if (letter == 'Å')
-      code = Code['Z'-' '+1];
-    if (letter == 'Ä')
-      code = Code['Z'-' '+2];
-    if (letter == 'Ö')
-      code = Code['Z'-' '+3];
-    if (letter == 'Ü')
-      code = Code['Z'-' '+4];
-      //else code = 0;			// If not, it's not Morse
-  }
+  // this is kind of ugly
+  // BUG 1: C++ and -Wmultichar ???
+  // BUG 2: Fluid and ÅÄÖÜ ???
+  if (letter == 'Å' || letter == 'å')
+    code = Code['Z'-' '+1];
+  if (letter == 'Ä' || letter == 'ä')
+    code = Code['Z'-' '+2];
+  if (letter == 'Ö' || letter == 'ö')
+    code = Code['Z'-' '+3];
+  if (letter == 'Ü' || letter == 'ü')
+    code = Code['Z'-' '+4];
+  //else code = 0;			// If not, it's not Morse
   while (Morse);			// Wait for queue to empty
   Morse = code; idle = 0;		// Stuff in latest char
   return true;				//  and report "success!"
