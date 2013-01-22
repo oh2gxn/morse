@@ -159,7 +159,7 @@ smaller->activate();}
     Fl_Roller Tone {
       label Tone
       callback adjust
-      tooltip {Adjust tone frequency} xywh {520 0 80 25} type Horizontal align 8 minimum 440 maximum 2000 step 50 value 1000
+      tooltip {Adjust tone frequency} xywh {520 0 80 25} type Horizontal align 8 minimum 440 maximum 2000 step 50 value 800
       class Knob
     }
     Fl_Group Lesson {

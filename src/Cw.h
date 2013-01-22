@@ -41,6 +41,7 @@ extern "C" {	// This lets Pyrex find our functions
 bool set_cw(double WPM = 20, 		// Words/minute (default 20)
 	    double freq = 800, 	        // Note (default 800 Hz)
 	    double loudness = 1.0);	// Loudness (default Maximum)
+  /* NOTE: these values are coupled with the ones in m.fl for GUI */
 	    
 bool send_cw(int ASCII);		// Send character in Morse Code
 double idle_cw();			// Seconds we've not been sending
